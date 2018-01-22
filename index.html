@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>EOS Exporer</title>
+
+    <!--VueJs and iview-->
+    <link rel="stylesheet" type="text/css" href="http://unpkg.com/iview/dist/styles/iview.css">
+    <script type="text/javascript" src="http://vuejs.org/js/vue.min.js"></script>
+    <script type="text/javascript" src="http://unpkg.com/iview/dist/iview.min.js"></script>
+    <script src="//unpkg.com/iview/dist/locale/en-US.js"></script>
+    <script>iview.lang('en-US');</script>
+
+    <!--axios-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+
+    <div class="layout">
+        <i-layout>
+            <i-header>
+                <h1 style="color:white">EOS Testnet Monitor</h1>
+            </i-header>
+
+            <i-content :style="{padding: '0 50px'}">
+                <Breadcrumb :style="{margin: '20px 0'}">
+                    <BreadcrumbItem></BreadcrumbItem>
+                </Breadcrumb>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Get Info from Testnet</p>
+                            <a href="#" slot="extra" @click.prevent="getInfo">
+                                <Icon type="ios-loop-strong"></Icon>
+                                Refresh
+                            </a>
+                            <p>
+                                <pre>{{infoMsg}}</pre>
+                            </p>
+                        </Card>
+                    </i-col>
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="11">
+                        <Card :bordered="false">
+                            <p slot="title">Last 10 new Accounts</p>
+                             <a href="#" slot="extra" @click.prevent="get_account_list">
+                                <Icon type="ios-loop-strong"></Icon>
+                                Refresh
+                            </a>
+                            <a href="#" slot="extra" @click.prevent="clear_account_list">
+                                <Icon type="ios-close-outline"></Icon>
+                                Clear
+                            </a>
+                            <p>
+                                <pre>{{accountList}}</pre>
+                            </p>
+
+                        </Card>
+                    </i-col>
+                    <i-col span="12" offset="1">
+                        <Card :bordered="false">
+                            <p slot="title">Last 10 new Blocks</p>
+                             <a href="#" slot="extra" @click.prevent="get_block_list">
+                                <Icon type="ios-loop-strong"></Icon>
+                                Refresh
+                            </a>
+
+                            <a href="#" slot="extra" @click.prevent="clear_block_list">
+                                <Icon type="ios-close-outline"></Icon>
+                                Clear
+                            </a>
+                            <p>
+                                <pre>{{blockList}}</pre>
+                            </p>
+                        </Card>
+                    </i-col>
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="11">
+                        <Card :bordered="false">
+                            <p slot="title">Last 10 new Transactions</p>
+                             <a href="#" slot="extra" @click.prevent="get_transaction_list">
+                              <Icon type="ios-loop-strong"></Icon>
+                                Refresh
+                            </a>
+
+                            <a href="#" slot="extra" @click.prevent="clear_transaction_list">
+                                <Icon type="ios-close-outline"></Icon>
+                                Clear
+                            </a>
+                            <p>
+                                <pre>{{transactionList}}</pre>
+                            </p>
+                        </Card>
+                    </i-col>
+                    <i-col span="12" offset="1">
+                        <Card :bordered="false">
+                            <p slot="title">Last 10 new Messages</p>
+                             <a href="#" slot="extra" @click.prevent="get_message_list">
+                                <Icon type="ios-loop-strong"></Icon>
+                                Refresh
+                            </a>
+                            <a href="#" slot="extra" @click.prevent="clear_message_list">
+                                <Icon type="ios-close-outline"></Icon>
+                                Clear
+                            </a>
+                            <p>
+                                <pre>{{messageList}}</pre>
+                            </p>
+                        </Card>
+                    </i-col>
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Account by account name or _id</p>
+                            <i-input v-model="accountName" placeholder="Account Name"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_account_by_name">ByName</i-button>
+
+                            <i-input v-model="accountId" placeholder="Account ID"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_account_by_id">ByID</i-button>
+
+                            <p><pre>{{accountMsg}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Last 10 Transactions by account name</p>
+                            <i-input v-model="accountName4Transaction" placeholder="account name"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_transaction_list_by_account_name">By Name</i-button>
+
+                            <p><pre>{{transactionListByAccountName}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Last 10 Messages by account name</p>
+                            <i-input v-model="accountName4Message" placeholder="account name"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_message_list_by_account_name">By Name</i-button>
+
+                            <p><pre>{{messageListByAccountName}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Block by _id or block_id</p>
+                            <i-input v-model="block_id" placeholder="_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_block_by_id">By _id</i-button>
+
+                            <i-input v-model="block_b_id" placeholder="block_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_block_by_b_id">By block_id</i-button>
+
+                            <p><pre>{{blockMsg}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Transaction by _id or transaction_id</p>
+                            <i-input v-model="transaction_id" placeholder="_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_transaction_by_id">By _id</i-button>
+
+                            <i-input v-model="transaction_t_id" placeholder="transaction_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_transaction_by_t_id">By transaction_id</i-button>
+
+                            <p><pre>{{transactionMsg}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+                <Row style="background:#eee;padding:20px">
+                    <i-col span="24">
+                        <Card :bordered="false">
+                            <p slot="title">Query Message by _id or transaction_id</p>
+                            <i-input v-model="message_id" placeholder="_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_message_by_id">By _id</i-button>
+
+                            <i-input v-model="transaction_t_id" placeholder="transaction_id"
+                                     style="width: 300px"></i-input>
+
+                            <i-button @click="get_message_by_t_id">By transaction_id</i-button>
+
+                            <p><pre>{{messageMsg}}</pre></p>
+                        </Card>
+                    </i-col>
+
+                </Row>
+
+
+            </i-content>
+            <br>
+
+            <i-footer class="layout-footer-center">
+                <p>2018 EOS Testnet Monitor |
+                    <a href="https://forums.eosgo.io/discussion/112/create-a-block-explorer-for-eos"
+                       target="_blank">Feedback</a>
+                    <a href="https://github.com/perebor3/eosmonitor.info"
+                       target="_blank">Github</a>
+                </p>
+                <p>Donations: ETH 0x6603a0f83BfaFdA520694e23daA9aDd8d794ba10</p>
+            </i-footer>
+        </i-layout>
+    </div>
+</div>
+
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            testnetEndpoint: "testnet1.eos.io",
+            nodeApiUrlBase: "http://api.eosmonitor.info:3000",
+            httpRpcApiUrlBase: "http://api.eosmonitor.info:8888",
+            accountName: "eos",
+            accountId: "",
+            block_id: "",
+            block_b_id: "",
+            transaction_id: "",
+            transaction_t_id: "",
+            message_id: "",
+            accountName4Transaction: "",
+            accountName4Message: "",
+            infoMsg: "Message return from get info ...",
+            accountList: [],
+            accountMsg: {},
+            blockList: [],
+            blockMsg: {},
+            transactionList: [],
+            transactionListByAccountName: [],
+            messageListByAccountName: [],
+            transactionMsg: {},
+            messageList: [],
+            messageMsg: {}
+        },
+        methods: {
+            clear_account_list: function () {
+                this.accountList = {};
+            },
+            clear_block_list: function () {
+                this.blockList = {};
+            },
+            clear_transaction_list: function () {
+                this.transactionList = {};
+            },
+            clear_message_list: function () {
+                this.messageList = {};
+            },
+
+            getInfo: function () {
+                vm = this;
+                axios.get(vm.httpRpcApiUrlBase + '/v1/chain/get_info')
+                    .then(function (response) {
+                        vm.infoMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.infoMsg = error.data
+                    });
+            },
+
+            // Query List
+            get_account_list: function () {
+                vm = this;
+                vm.accountList = {loading: '...'};
+                axios.get(vm.nodeApiUrlBase + "/accounts/")
+                    .then(function (response) {
+                        vm.accountList = response.data
+                    })
+                    .catch(function (error) {
+                        vm.accountList = error.data
+                    });
+            },
+            get_block_list: function () {
+                vm = this;
+                vm.blockList = {loading: '...'};
+                axios.get(vm.nodeApiUrlBase + "/blocks/")
+                    .then(function (response) {
+                        vm.blockList = response.data
+                    })
+                    .catch(function (error) {
+                        vm.blockList = error.data
+                    });
+            },
+            get_transaction_list: function () {
+                vm = this;
+                vm.transactionList = {loading: '...'};
+                axios.get(vm.nodeApiUrlBase + "/transactions/")
+                    .then(function (response) {
+                        vm.transactionList = response.data
+                    })
+                    .catch(function (error) {
+                        vm.transactionList = error.data
+                    });
+            },
+            get_message_list: function () {
+                vm = this;
+                vm.messageList = {"loading": "..."};
+                axios.get(vm.nodeApiUrlBase + "/messages/")
+                    .then(function (response) {
+                        vm.messageList = response.data
+                    })
+                    .catch(function (error) {
+                        vm.messageList = error.data
+                    });
+            },
+
+            // Query by _id
+            get_account_by_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/accounts/" + vm.accountId)
+                    .then(function (response) {
+                        vm.accountMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.accountMsg = error.data
+                    });
+            },
+            get_block_by_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/blocks/" + vm.block_id)
+                    .then(function (response) {
+                        vm.blockMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.blockMsg = error.data
+                    });
+            },
+            get_transaction_by_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/transactions/" + vm.transaction_id)
+                    .then(function (response) {
+                        vm.transactionMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.transactionMsg = error.data
+                    });
+            },
+            get_message_by_id: function () {
+                vm = this;
+                axios.get("http://api.eosmonitor.info:3000/messages/" + vm.message_id)
+                    .then(function (response) {
+                        vm.messageMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.messageMsg = error.data
+                    });
+            },
+
+            // special query
+            get_account_by_name: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/accounts/name/" + vm.accountName)
+                    .then(function (response) {
+                        vm.accountMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.accountMsg = error.data
+                    });
+            },
+            get_block_by_b_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase +  "/blocks/b/" + vm.block_b_id)
+                    .then(function (response) {
+                        vm.blockMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.blockMsg = error.data
+                    });
+            },
+            get_transaction_by_t_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/transactions/t/" + vm.transaction_t_id)
+                    .then(function (response) {
+                        vm.transactionMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.transactionMsg = error.data
+                    });
+            },
+            get_message_by_t_id: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/messages/t/" + vm.transaction_t_id)
+                    .then(function (response) {
+                        vm.transactionMsg = response.data
+                    })
+                    .catch(function (error) {
+                        vm.transactionMsg = error.data
+                    });
+            },
+            get_transaction_list_by_account_name: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/transactions/account/" + vm.accountName4Transaction)
+                    .then(function (response) {
+                        vm.transactionListByAccountName = response.data
+                    })
+                    .catch(function (error) {
+                        vm.transactionListByAccountName = error.data
+                    });
+            },
+            get_message_list_by_account_name: function () {
+                vm = this;
+                axios.get(vm.nodeApiUrlBase + "/messages/account/" + vm.accountName4Message)
+                    .then(function (response) {
+                        vm.messageListByAccountName = response.data
+                    })
+                    .catch(function (error) {
+                        vm.messageListByAccountName = error.data
+                    });
+            }
+        }
+    })
+</script>
+
+<style>
+    .layout {
+        border: 1px solid #d7dde4;
+        background: #f5f7f9;
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .layout-logo {
+        width: 100px;
+        height: 30px;
+        background: #5b6270;
+        border-radius: 3px;
+        float: left;
+        position: relative;
+        top: 15px;
+        left: 20px;
+    }
+
+    .layout-nav {
+        width: 420px;
+        margin: 0 auto;
+        margin-right: 20px;
+    }
+
+    .layout-footer-center {
+        text-align: center;
+    }
+    .top{
+        padding: 10px;
+        background: rgba(0, 153, 229, .7);
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+    }
+</style>
+
+</body>
+</html>
