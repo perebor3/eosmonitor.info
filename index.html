@@ -1,255 +1,448 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>EOS Exporer</title>
+    <meta charset="UTF-8">
+    <title>Title</title>
 
-    <!--VueJs and iview-->
-    <link rel="stylesheet" type="text/css" href="http://unpkg.com/iview/dist/styles/iview.css">
-    <script type="text/javascript" src="http://vuejs.org/js/vue.min.js"></script>
-    <script type="text/javascript" src="http://unpkg.com/iview/dist/iview.min.js"></script>
-    <script src="//unpkg.com/iview/dist/locale/en-US.js"></script>
-    <script>iview.lang('en-US');</script>
-
-    <!--axios-->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- import Style -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 
 </head>
 <body>
-
 <div id="app">
+    <el-container>
+        <el-header>
+            <h1 style="color:white">EOS Testnet Monitor</h1>
+        </el-header>
+        <el-main>
+            <el-tabs v-model="activeTabName" type="border-card" @tab-click="handleTabClick">
+                <el-tab-pane label="Dashboard" name="dashboard" style="background:#eee;padding:20px">
+                    <p>Total</p>
+                    <el-row :gutter="20">
+                        <el-col v-for="item in countGroup" :span="6">
+                            <el-card class="box-card">
+                                <div slot="header">
+                                    <span>Total {{item.key}}</span>
+                                </div>
+                                <div>
+                                    {{item.value}}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-    <div class="layout">
-        <i-layout>
-            <i-header>
-                <h1 style="color:white">EOS Testnet Monitor</h1>
-            </i-header>
+                    <p>Last week</p>
+                    <el-row :gutter="20">
+                        <el-col v-for="item in countGroup" :span="6">
+                            <el-card class="box-card">
+                                <div slot="header">
+                                    <span>{{item.key}}</span>
+                                </div>
+                                <div>
+                                    {{item.value}}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-            <i-content :style="{padding: '0 50px'}">
-                <Breadcrumb :style="{margin: '20px 0'}">
-                    <BreadcrumbItem></BreadcrumbItem>
-                </Breadcrumb>
+                    <p>Last 24 Hours</p>
+                    <el-row :gutter="20">
+                        <el-col v-for="item in countGroup" :span="6">
+                            <el-card class="box-card">
+                                <div slot="header">
+                                    <span>{{item.key}}</span>
+                                </div>
+                                <div>
+                                    {{item.value}}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Get Info from Testnet</p>
-                            <a href="#" slot="extra" @click.prevent="getInfo">
-                                <Icon type="ios-loop-strong"></Icon>
-                                Refresh
-                            </a>
-                            <p>
-                                <pre>{{infoMsg}}</pre>
-                            </p>
-                        </Card>
-                    </i-col>
-                </Row>
+                    <p>Last Hours</p>
+                    <el-row :gutter="20">
+                        <el-col v-for="item in countGroup" :span="6">
+                            <el-card class="box-card">
+                                <div slot="header">
+                                    <span>{{item.key}}</span>
+                                </div>
+                                <div>
+                                    {{item.value}}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="11">
-                        <Card :bordered="false">
-                            <p slot="title">Last 10 new Accounts</p>
-                             <a href="#" slot="extra" @click.prevent="get_account_list">
-                                <Icon type="ios-loop-strong"></Icon>
-                                Refresh
-                            </a>
-                            <a href="#" slot="extra" @click.prevent="clear_account_list">
-                                <Icon type="ios-close-outline"></Icon>
-                                Clear
-                            </a>
-                            <p>
-                                <pre>{{accountList}}</pre>
-                            </p>
+                </el-tab-pane>
+                <el-tab-pane label="Status" name="first" style="background:#eee;padding:20px">
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Get Info from Testnet</span>
+                                    <el-button-group style="float: right;">
+                                        <el-button @click="getInfo" type="primary" size="mini" plain>
+                                            <i class="el-icon-refresh"></i>
+                                            Refresh
+                                        </el-button>
+                                        <el-button @click="clear_var('infoMsg')" type="primary" size="mini"
+                                                   plain>
+                                            <i class="el-icon-circle-close-outline"></i>
+                                            Clear
+                                        </el-button>
+                                    </el-button-group>
+                                </div>
+                                <div>
+                                    <pre>{{infoMsg}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                        </Card>
-                    </i-col>
-                    <i-col span="12" offset="1">
-                        <Card :bordered="false">
-                            <p slot="title">Last 10 new Blocks</p>
-                             <a href="#" slot="extra" @click.prevent="get_block_list">
-                                <Icon type="ios-loop-strong"></Icon>
-                                Refresh
-                            </a>
+                    <el-row style="background:#eee;padding:20px" :gutter="20">
+                        <el-col :span="12">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Last 10 new Accounts</span>
+                                    <el-button-group style="float: right;">
+                                        <el-button @click="get_account_list" type="primary" size="mini" plain>
+                                            <i class="el-icon-refresh"></i>
+                                            Refresh
+                                        </el-button>
+                                        <el-button @click="clear_var('accountList')" type="primary" size="mini"
+                                                   plain>
+                                            <i class="el-icon-circle-close-outline"></i>
+                                            Clear
+                                        </el-button>
+                                    </el-button-group>
+                                </div>
+                                <div v-loading="accountListLoading">
+                                    <pre>{{accountList}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Last 10 new Blocks</span>
+                                    <el-button-group style="float: right;">
+                                        <el-button @click="get_block_list" type="primary" size="mini" plain>
+                                            <i class="el-icon-refresh"></i>
+                                            Refresh
+                                        </el-button>
+                                        <el-button @click="clear_var('blockList')" type="primary" size="mini"
+                                                   plain>
+                                            <i class="el-icon-circle-close-outline"></i>
+                                            Clear
+                                        </el-button>
+                                    </el-button-group>
+                                </div>
+                                <div v-loading="blockListLoading">
+                                    <pre>{{blockList}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                            <a href="#" slot="extra" @click.prevent="clear_block_list">
-                                <Icon type="ios-close-outline"></Icon>
-                                Clear
-                            </a>
-                            <p>
-                                <pre>{{blockList}}</pre>
-                            </p>
-                        </Card>
-                    </i-col>
-                </Row>
+                    <el-row style="background:#eee;padding:20px" :gutter="20">
+                        <el-col :span="12">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Last 10 new Transaction</span>
+                                    <el-button-group style="float: right;">
+                                        <el-button @click="get_transaction_list" type="primary" size="mini" plain>
+                                            <i class="el-icon-refresh"></i>
+                                            Refresh
+                                        </el-button>
+                                        <el-button @click="clear_var('transactionList')" type="primary" size="mini"
+                                                   plain>
+                                            <i class="el-icon-circle-close-outline"></i>
+                                            Clear
+                                        </el-button>
+                                    </el-button-group>
+                                </div>
+                                <div v-loading="transactionListLoading">
+                                    <pre>{{transactionList}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Last 10 new Messages</span>
+                                    <el-button-group style="float: right;">
+                                        <el-button @click="get_message_list" type="primary" size="mini" plain>
+                                            <i class="el-icon-refresh"></i>
+                                            Refresh
+                                        </el-button>
+                                        <el-button @click="clear_var('messageList')" type="primary" size="mini"
+                                                   plain>
+                                            <i class="el-icon-circle-close-outline"></i>
+                                            Clear
+                                        </el-button>
+                                    </el-button-group>
+                                </div>
+                                <div v-loading="messageListLoading">
+                                    <pre>{{messageList}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="11">
-                        <Card :bordered="false">
-                            <p slot="title">Last 10 new Transactions</p>
-                             <a href="#" slot="extra" @click.prevent="get_transaction_list">
-                              <Icon type="ios-loop-strong"></Icon>
-                                Refresh
-                            </a>
+                </el-tab-pane>
 
-                            <a href="#" slot="extra" @click.prevent="clear_transaction_list">
-                                <Icon type="ios-close-outline"></Icon>
-                                Clear
-                            </a>
-                            <p>
-                                <pre>{{transactionList}}</pre>
-                            </p>
-                        </Card>
-                    </i-col>
-                    <i-col span="12" offset="1">
-                        <Card :bordered="false">
-                            <p slot="title">Last 10 new Messages</p>
-                             <a href="#" slot="extra" @click.prevent="get_message_list">
-                                <Icon type="ios-loop-strong"></Icon>
-                                Refresh
-                            </a>
-                            <a href="#" slot="extra" @click.prevent="clear_message_list">
-                                <Icon type="ios-close-outline"></Icon>
-                                Clear
-                            </a>
-                            <p>
-                                <pre>{{messageList}}</pre>
-                            </p>
-                        </Card>
-                    </i-col>
-                </Row>
+                <el-tab-pane label="Query" name="second" style="background:#eee;padding:20px">
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Account by account name or _id</span>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Account by account name or _id</p>
-                            <i-input v-model="accountName" placeholder="Account Name"
-                                     style="width: 300px"></i-input>
+                                    <el-button @click="clear_var('accountMsg')" type="primary"
+                                               size="mini"
+                                               plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
+                                <div>
+                                    <el-input v-model="accountName" placeholder="Account Name"
+                                              style="width: 300px"></el-input>
 
-                            <i-button @click="get_account_by_name">ByName</i-button>
+                                    <el-button @click="get_account_by_name" type="primary" plain>By Name</el-button>
 
-                            <i-input v-model="accountId" placeholder="Account ID"
-                                     style="width: 300px"></i-input>
+                                    <el-input v-model="accountId" placeholder="Account ID"
+                                              style="width: 300px"></el-input>
 
-                            <i-button @click="get_account_by_id">ByID</i-button>
+                                    <el-button @click="get_account_by_id" type="primary" plain>By ID</el-button>
+                                    <pre>{{accountMsg}}</pre>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                            <p><pre>{{accountMsg}}</pre></p>
-                        </Card>
-                    </i-col>
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Last 10 Transactions by account name</span>
 
-                </Row>
+                                    <el-button @click="clear_var('transactionListByAccountName')" type="primary"
+                                               size="mini"
+                                               plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
+                                <div>
+                                    <el-input v-model="accountName4Transaction" placeholder="account name"
+                                              style="width: 300px"></el-input>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Last 10 Transactions by account name</p>
-                            <i-input v-model="accountName4Transaction" placeholder="account name"
-                                     style="width: 300px"></i-input>
+                                    <el-button @click="get_transaction_list_by_account_name" type="primary" plain>By
+                                        Name
+                                    </el-button>
 
-                            <i-button @click="get_transaction_list_by_account_name">By Name</i-button>
+                                    <pre>{{transactionListByAccountName}}</pre>
+                                </div>
 
-                            <p><pre>{{transactionListByAccountName}}</pre></p>
-                        </Card>
-                    </i-col>
+                            </el-card>
+                        </el-col>
 
-                </Row>
+                    </el-row>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Last 10 Messages by account name</p>
-                            <i-input v-model="accountName4Message" placeholder="account name"
-                                     style="width: 300px"></i-input>
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Last 10 Messages by account name</span>
 
-                            <i-button @click="get_message_list_by_account_name">By Name</i-button>
+                                    <el-button @click="clear_var('messageListByAccountName')" type="primary" size="mini"
+                                               plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
 
-                            <p><pre>{{messageListByAccountName}}</pre></p>
-                        </Card>
-                    </i-col>
+                                <div>
+                                    <el-input v-model="accountName4Message" placeholder="account name"
+                                              style="width: 300px"></el-input>
 
-                </Row>
+                                    <el-button @click="get_message_list_by_account_name" type="primary" plain>By Name
+                                    </el-button>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Block by _id or block_id</p>
-                            <i-input v-model="block_id" placeholder="_id"
-                                     style="width: 300px"></i-input>
+                                    <pre>{{messageListByAccountName}}</pre>
+                                </div>
 
-                            <i-button @click="get_block_by_id">By _id</i-button>
+                            </el-card>
+                        </el-col>
 
-                            <i-input v-model="block_b_id" placeholder="block_id"
-                                     style="width: 300px"></i-input>
+                    </el-row>
 
-                            <i-button @click="get_block_by_b_id">By block_id</i-button>
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Block by _id or block_id</span>
+                                    <el-button @click="clear_var('blockMsg')" type="primary" size="mini" plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
 
-                            <p><pre>{{blockMsg}}</pre></p>
-                        </Card>
-                    </i-col>
+                                <div>
+                                    <el-input v-model="block_id" placeholder="_id"
+                                              style="width: 300px"></el-input>
 
-                </Row>
+                                    <el-button @click="get_block_by_id" type="primary" plain>By _id</el-button>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Transaction by _id or transaction_id</p>
-                            <i-input v-model="transaction_id" placeholder="_id"
-                                     style="width: 300px"></i-input>
+                                    <el-input v-model="block_b_id" placeholder="block_id"
+                                              style="width: 300px"></el-input>
 
-                            <i-button @click="get_transaction_by_id">By _id</i-button>
+                                    <el-button @click="get_block_by_b_id" type="primary" plain>By block_id</el-button>
 
-                            <i-input v-model="transaction_t_id" placeholder="transaction_id"
-                                     style="width: 300px"></i-input>
+                                    <pre>{{blockMsg}}</pre>
+                                </div>
 
-                            <i-button @click="get_transaction_by_t_id">By transaction_id</i-button>
+                            </el-card>
+                        </el-col>
 
-                            <p><pre>{{transactionMsg}}</pre></p>
-                        </Card>
-                    </i-col>
+                    </el-row>
 
-                </Row>
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Transaction by _id or transaction_id</span>
 
-                <Row style="background:#eee;padding:20px">
-                    <i-col span="24">
-                        <Card :bordered="false">
-                            <p slot="title">Query Message by _id or transaction_id</p>
-                            <i-input v-model="message_id" placeholder="_id"
-                                     style="width: 300px"></i-input>
+                                    <el-button @click="clear_var('transactionMsg')" type="primary" size="mini" plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
+                                <div>
+                                    <el-input v-model="transaction_id" placeholder="_id"
+                                              style="width: 300px"></el-input>
 
-                            <i-button @click="get_message_by_id">By _id</i-button>
+                                    <el-button @click="get_transaction_by_id" type="primary" plain>By _id</el-button>
 
-                            <i-input v-model="transaction_t_id" placeholder="transaction_id"
-                                     style="width: 300px"></i-input>
+                                    <el-input v-model="transaction_t_id" placeholder="transaction_id"
+                                              style="width: 300px"></el-input>
 
-                            <i-button @click="get_message_by_t_id">By transaction_id</i-button>
+                                    <el-button @click="get_transaction_by_t_id" type="primary" plain>By transaction_id
+                                    </el-button>
 
-                            <p><pre>{{messageMsg}}</pre></p>
-                        </Card>
-                    </i-col>
+                                    <pre>{{transactionMsg}}</pre>
+                                </div>
 
-                </Row>
+                            </el-card>
+                        </el-col>
 
+                    </el-row>
 
-            </i-content>
+                    <el-row style="background:#eee;padding:20px">
+                        <el-col :span="24">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span>Query Message by _id or transaction_id</span>
+                                    <el-button @click="clear_var('messageMsg')" type="primary" size="mini" plain
+                                               style="float: right;">
+                                        <i class="el-icon-circle-close-outline"></i>
+                                        Clear
+                                    </el-button>
+                                </div>
+                                <div>
+                                    <el-input v-model="message_id" placeholder="_id"
+                                              style="width: 300px"></el-input>
+
+                                    <el-button @click="get_message_by_id" type="primary" plain>By _id</el-button>
+
+                                    <el-input v-model="transaction_t_id" placeholder="transaction_id"
+                                              style="width: 300px"></el-input>
+
+                                    <el-button @click="get_message_by_t_id" type="primary" plain>By transaction_id
+                                    </el-button>
+
+                                    <pre>{{messageMsg}}</pre>
+                                </div>
+
+                            </el-card>
+                        </el-col>
+
+                    </el-row>
+                </el-tab-pane>
+                <el-tab-pane label="Console" name="third" style="background:#eee;padding:20px">
+                    <p>Live Log Console base on WebSocket.</p>
+                    <p>Comming soon.</p>
+                </el-tab-pane>
+                <el-tab-pane label="Batch Tasks" name="fourth" style="background:#eee;padding:20px">
+                    <p>Batch Tasks Coming Soon</p>
+                </el-tab-pane>
+            </el-tabs>
+        </el-main>
+        <el-footer>
+            <p>2018 EOS Testnet Monitor |
+                <a href="https://forums.eosgo.io/discussion/112/create-a-block-explorer-for-eos"
+                   target="_blank">Feedback</a>
+                <a href="https://github.com/perebor3/eosmonitor.info"
+                   target="_blank">Github</a>
+            </p>
+
+            <p>Donations: ETH 0x6603a0f83BfaFdA520694e23daA9aDd8d794ba10</p>
+
             <br>
+        </el-footer>
+    </el-container>
 
-            <i-footer class="layout-footer-center">
-                <p>2018 EOS Testnet Monitor |
-                    <a href="https://forums.eosgo.io/discussion/112/create-a-block-explorer-for-eos"
-                       target="_blank">Feedback</a>
-                    <a href="https://github.com/perebor3/eosmonitor.info"
-                       target="_blank">Github</a>
-                </p>
-                <p>Donations: ETH 0x6603a0f83BfaFdA520694e23daA9aDd8d794ba10</p>
-            </i-footer>
-        </i-layout>
-    </div>
+
 </div>
+
+</body>
+
+<!-- VueJs & Element-UI -->
+<script src="https://unpkg.com/vue"></script>
+<!--<script src="https://unpkg.com/element-ui"></script>-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<!--<script src="https://unpkg.com/element-ui/lib/umd/locale/en.js"></script>-->
+
+<!--<script>ELEMENT.locale(ELEMENT.lang.en)</script>-->
+
+<!--axios-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 
 <script>
     new Vue({
         el: '#app',
         data: {
+            countGroup: [
+                {
+                    key: "accounts",
+                    value: 33
+                },
+                {
+                    key: "blocks",
+                    value: 444
+                },
+                {
+                    key: "transactions",
+                    value: 5555
+                },
+                {
+                    key: "messages",
+                    value: 66666
+                },
+            ],
+            accountListLoading: "false",
+            blockListLoading: "false",
+            transactionListLoading: "false",
+            messageListLoading: "false",
+            activeTabName: 'dashboard',
             testnetEndpoint: "testnet1.eos.io",
             nodeApiUrlBase: "http://api.eosmonitor.info:3000",
             httpRpcApiUrlBase: "http://api.eosmonitor.info:8888",
@@ -274,19 +467,31 @@
             messageList: [],
             messageMsg: {}
         },
+        created: function () {
+            this.accountListLoading = false;
+            this.blockListLoading = false;
+            this.transactionListLoading = false;
+            this.messageListLoading = false;
+        },
         methods: {
-            clear_account_list: function () {
-                this.accountList = {};
+            handleTabClick: function () {
+                console.log("switch tab")
             },
-            clear_block_list: function () {
-                this.blockList = {};
+            clear_var: function (varname) {
+                this.$data[varname] = {};
             },
-            clear_transaction_list: function () {
-                this.transactionList = {};
-            },
-            clear_message_list: function () {
-                this.messageList = {};
-            },
+            // clear_account_list: function () {
+            //     this.accountList = {};
+            // },
+            // clear_block_list: function () {
+            //     this.blockList = {};
+            // },
+            // clear_transaction_list: function () {
+            //     this.transactionList = {};
+            // },
+            // clear_message_list: function () {
+            //     this.messageList = {};
+            // },
 
             getInfo: function () {
                 vm = this;
@@ -302,46 +507,60 @@
             // Query List
             get_account_list: function () {
                 vm = this;
+                vm.accountListLoading = true;
                 vm.accountList = {loading: '...'};
                 axios.get(vm.nodeApiUrlBase + "/accounts/")
                     .then(function (response) {
-                        vm.accountList = response.data
+                        vm.accountList = response.data;
+                        vm.accountListLoading = false;
                     })
                     .catch(function (error) {
-                        vm.accountList = error.data
+                        vm.accountList = error.data;
+                        vm.accountListLoading = false;
+
                     });
             },
             get_block_list: function () {
                 vm = this;
+                vm.blockListLoading = true;
                 vm.blockList = {loading: '...'};
                 axios.get(vm.nodeApiUrlBase + "/blocks/")
                     .then(function (response) {
-                        vm.blockList = response.data
+                        vm.blockList = response.data;
+                        vm.blockListLoading = false;
                     })
                     .catch(function (error) {
-                        vm.blockList = error.data
+                        vm.blockList = error.data;
+                        vm.blockListLoading = false;
                     });
             },
             get_transaction_list: function () {
                 vm = this;
                 vm.transactionList = {loading: '...'};
+                vm.transactionListLoading = true;
                 axios.get(vm.nodeApiUrlBase + "/transactions/")
                     .then(function (response) {
-                        vm.transactionList = response.data
+                        vm.transactionList = response.data;
+                        vm.transactionListLoading = false;
                     })
                     .catch(function (error) {
-                        vm.transactionList = error.data
+                        vm.transactionList = error.data;
+                        vm.transactionListLoading = false;
                     });
             },
             get_message_list: function () {
                 vm = this;
+                vm.messageListLoading = true;
                 vm.messageList = {"loading": "..."};
                 axios.get(vm.nodeApiUrlBase + "/messages/")
                     .then(function (response) {
-                        vm.messageList = response.data
+                        vm.messageList = response.data;
+                        vm.messageListLoading = false;
                     })
                     .catch(function (error) {
-                        vm.messageList = error.data
+                        vm.messageList = error.data;
+                        vm.messageListLoading = false;
+
                     });
             },
 
@@ -400,7 +619,7 @@
             },
             get_block_by_b_id: function () {
                 vm = this;
-                axios.get(vm.nodeApiUrlBase +  "/blocks/b/" + vm.block_b_id)
+                axios.get(vm.nodeApiUrlBase + "/blocks/b/" + vm.block_b_id)
                     .then(function (response) {
                         vm.blockMsg = response.data
                     })
@@ -449,46 +668,56 @@
                     });
             }
         }
-    })
+    });
 </script>
 
 <style>
-    .layout {
+    .el-header {
+        width: 100%;
+        height: 50px;
+        background: #5b6270;
+        border-radius: 3px;
+        float: left;
+        position: relative;
+        top: 0px;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+
+    }
+
+    .body {
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    .el-footer {
+        text-align: center;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+
+    }
+
+    .el-main {
         border: 1px solid #d7dde4;
         background: #f5f7f9;
         position: relative;
         border-radius: 4px;
         overflow: hidden;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+
     }
 
-    .layout-logo {
-        width: 100px;
-        height: 30px;
-        background: #5b6270;
-        border-radius: 3px;
-        float: left;
-        position: relative;
-        top: 15px;
-        left: 20px;
+    .el-row {
+        margin-bottom: 10px;
+        /*:last-child {*/
+        /*margin-bottom: 0;*/
+        /*}*/
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+
     }
 
-    .layout-nav {
-        width: 420px;
-        margin: 0 auto;
-        margin-right: 20px;
+    .el-col {
+        border-radius: 4px;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+
     }
 
-    .layout-footer-center {
-        text-align: center;
-    }
-    .top{
-        padding: 10px;
-        background: rgba(0, 153, 229, .7);
-        color: #fff;
-        text-align: center;
-        border-radius: 2px;
-    }
 </style>
-
-</body>
 </html>
