@@ -57,7 +57,7 @@ As of today (2018/01/22), testnet1.eos.io chain have 5.951GB data in mongodb dat
 
 [Getting EOS code](https://github.com/EOSIO/eos/wiki/Local-Environment#1-getting-the-code)
 
-[Install MongoDB support](https://github.com/EOSIO/eos/blob/master/plugins/db_plugin/CMakeLists.txt#L36)
+[Install MongoDB support](https://github.com/EOSIO/eos/blob/master/plugins/mongo_db_plugin/CMakeLists.txt#L51)
 
 This is the part that missing in official wiki document.
 
